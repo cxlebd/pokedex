@@ -66,6 +66,6 @@ const createPokemon = pokemon => {
 
 btn.addEventListener('click', () => {
     const nombreid = document.getElementById('nombreid').value;
-    fetchPokemons(10);
+    
     fetchPokemon(nombreid);
 });
