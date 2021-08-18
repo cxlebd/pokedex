@@ -5,17 +5,12 @@ const fetchPokemon = id => {
     fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`)
     .then(res => res.json())
     .then(data => {
-        createPokemon(data);
+    createPokemon(data);
     });
+    
 }
 
-const fetchPokemons = number => {
-    for(let i =1; i <= number; i++) {
-        fetchPokemon(i);
-    }
-}
-
-const createPokemon = pokemon => {    
+const createPokemon = (pokemon) => {    
 
     const card = document.createElement('div');
     card.classList.add('pokemon-block');
@@ -24,8 +19,6 @@ const createPokemon = pokemon => {
     card.classList.add('text-white');
     card.classList.add('bg-dark');
     card.classList.add('text-end');
-
-    // card text-dark bg-warning mb-3
 
     const col = document.createElement('div');
     col.classList.add('col');
@@ -38,34 +31,39 @@ const createPokemon = pokemon => {
     spriteContainer.classList.add('img-container');
 
     const sprite = document.createElement('img');
-    sprite.src = pokemon.sprites.back_default;
+    sprite.src = pokemon.sprites.front_shiny;
     sprite.classList.add('card-img-top');
     
     spriteContainer.appendChild(sprite);
 
     const name = document.createElement('h5');
-    name.textContent = pokemon.name;
+    // Formato de nombre propio
+    name.textContent = pokemon.name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
     name.classList.add('card-title');
 
-    const number = document.createElement('p');
-    number.textContent = `ID: ${pokemon.id.toString().padStart(3, 0)}`;
-    number.classList.add('card-text');
+    const id = document.createElement('p');
+    id.textContent = `#${pokemon.id.toString().padStart(3, 0)}`;
+    
+    // Type
+    const typep = document.createElement('p');
+    typep.textContent = `Tipo: ${pokemon.type}`;
+    
+    id.appendChild(typep);
 
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
     cardBody.appendChild(name);
-    cardBody.appendChild(number);
+    cardBody.appendChild(id);
 
     card.appendChild(spriteContainer);
     card.appendChild(cardBody);
-
     
     pokemonContainer.appendChild(col);
 
 }
-
 btn.addEventListener('click', () => {
-    const nombreid = document.getElementById('nombreid').value;
+    // Se obtiene el dato con formato
+    const nombreid = document.getElementById('nombreid').value.replace(' ', '-').toLowerCase();
+    fetchPokemon(nombreid);   
     
-    fetchPokemon(nombreid);
 });
