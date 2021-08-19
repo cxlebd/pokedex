@@ -1,69 +1,89 @@
-const pokemonContainer = document.querySelector('.pokemoncontainer');
-const btn = document.getElementById('btn-buscar');
+const pokemonsContainer = document.querySelector('.pokemonsContainer');
+const pokeCard = document.querySelector('[data-poke-card]');
+const pokeName = document.querySelector('[data-poke-name]');
+const pokeImg = document.querySelector('[data-poke-img]');
+const pokeImgContainer = document.querySelector('[data-poke-img-container]');
+const pokeId = document.querySelector('[data-poke-id]');
+const pokeTypes = document.querySelector('[data-poke-types]');
+const pokeStats = document.querySelector('[data-poke-stats]');
 
-const fetchPokemon = id => {
-    fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`)
-    .then(res => res.json())
-    .then(data => {
-    createPokemon(data);
-    });
-    
-}
+const btnbuscar = document.querySelector('#btn-buscar');
 
-const createPokemon = (pokemon) => {    
-
-    const card = document.createElement('div');
-    card.classList.add('pokemon-block');
-    card.classList.add('card');
-    card.classList.add('w-auto');
-    card.classList.add('text-white');
-    card.classList.add('bg-dark');
-    card.classList.add('text-end');
-
-    const col = document.createElement('div');
-    col.classList.add('col');
-    col.style.marginTop = '2em';
-    
-    
-    col.appendChild(card);
-
-    const spriteContainer = document.createElement('div');
-    spriteContainer.classList.add('img-container');
-
-    const sprite = document.createElement('img');
-    sprite.src = pokemon.sprites.front_shiny;
-    sprite.classList.add('card-img-top');
-    
-    spriteContainer.appendChild(sprite);
-
-    const name = document.createElement('h5');
-    // Formato de nombre propio
-    name.textContent = pokemon.name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
-    name.classList.add('card-title');
-
-    const id = document.createElement('p');
-    id.textContent = `#${pokemon.id.toString().padStart(3, 0)}`;
-    
-    // Type
-    const typep = document.createElement('p');
-    typep.textContent = `Tipo: ${pokemon.type}`;
-    
-    id.appendChild(typep);
-
-    const cardBody = document.createElement('div');
-    cardBody.classList.add('card-body');
-    cardBody.appendChild(name);
-    cardBody.appendChild(id);
-
-    card.appendChild(spriteContainer);
-    card.appendChild(cardBody);
-    
-    pokemonContainer.appendChild(col);
+const typeColors = {
+    electric: '#FFEA70',
+    normal: '#B09398',
+    fire: '#FF675C',
+    water: '#0596C7',
+    ice: '#AFEAFD',
+    rock: '#999799',
+    flying: '#7AE7C7',
+    grass: '#4A9681',
+    psychic: '#FFC6D9',
+    ghost: '#561D25',
+    bug: '#A2FAA3',
+    poison: '#795663',
+    ground: '#D2B074',
+    dragon: '#DA627D',
+    steel: '#1D8A99',
+    fighting: '#2F2F2F',
+    default: '#2A1A1F'
 
 }
-btn.addEventListener('click', () => {
-    // Se obtiene el dato con formato
-    const nombreid = document.getElementById('nombreid').value.replace(' ', '-').toLowerCase();
-    fetchPokemon(nombreid);   
-    
+
+const buscarPokemon = () => {
+    alert('yes');
+}
+
+btnbuscar.addEventListener('click', () => {
+    const nombreid = document.querySelector('#nombreid').value.toLowerCase().replace(' ', '-');
+    fetch(`https://pokeapi.co/api/v2/pokemon/${nombreid}/`)
+        .then(data => data.json())
+        .then(response => renderPokemonData(response))
 });
+
+const renderPokemonData = data => {
+    
+    const sprite = data.sprites.front_default;
+    const { stats, types } = data;
+
+    pokeName.textContent = data.name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join(' ');
+    pokeImg.setAttribute('src', sprite);
+    pokeId.textContent = `#${data.id}`;
+    setColorTypes(types);
+    renderPokemonTypes(types);
+    renderPokemonStats(stats);
+}
+
+const setColorTypes = types => {
+    const colorOne = typeColors[types[0].type.name];
+    const colorTwo = types[1] ? typeColors[types[1].type.name] : typeColors.default;
+
+    pokeImg.style.background = `radial-gradient(${colorTwo} 33%, ${colorOne} 33%)`;
+    pokeImg.style.backgroundSize = '5px 5px';
+}
+
+const renderPokemonTypes = types => {
+    pokeTypes.innerHTML = '';
+    types.forEach(type => {
+        const typeTextElement = document.createElement('div');
+        typeTextElement.style.color = typeColors[type.type.name];
+        typeTextElement.textContent = type.type.name;
+        pokeTypes.appendChild(typeTextElement);
+
+    });
+}
+
+const renderPokemonStats = stats => {
+    pokeStats.innerHTML = '';
+    stats.forEach(stat => {
+        const statElement = document.createElement('div');
+        const statElementName = document.createElement('div');
+        const statElementAmount = document.createElement('div');
+
+        statElementName.textContent = stat.stat.name;
+        statElementAmount.textContent = stat.base_stat;
+        statElement.appendChild(statElementName);
+        statElement.appendChild(statElementAmount);
+        pokeStats.appendChild(statElement);
+    });
+}
